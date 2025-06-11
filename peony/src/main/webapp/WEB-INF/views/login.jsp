@@ -28,8 +28,8 @@
                             <button type="submit" class="btn btn-primary w-100 mt-2">로그인</button>
                         </form>
                         <div class="text-center mt-3">
-                            <a href="/register" class="btn btn-link">회원가입</a>
-                            <a href="/" class="btn btn-link">홈 화면</a>
+                            <a href="/user/register" class="btn btn-link">회원가입</a>
+                            <a href="/" class="btn btn-link">취소</a>
                         </div>
                     </div>
                 </div>

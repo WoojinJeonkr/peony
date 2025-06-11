@@ -8,6 +8,7 @@ import javax.servlet.http.HttpSession;
 import org.mindrot.jbcrypt.BCrypt;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -62,12 +63,16 @@ public class UserController {
 	    User user = db.getUserInfo(id);
 
 	    if (user != null && BCrypt.checkpw(pwd, user.getPwd())) {
-	    	session.setAttribute("user", user);
-	        data.put("message", "로그인 성공");
-	        data.put("name", user.getName());
-	        data.put("userType", user.getUserType());
+	    	if ("DELETED".equals(user.getStatus())) {
+	    		data.put("message", "탈퇴된 계정입니다.");
+	    	} else {
+	    		session.setAttribute("user", user);
+	    		data.put("message", "로그인 성공");
+	    		data.put("name", user.getName());
+	    		data.put("userType", user.getUserType());
+	    	}
 	    } else {
-	        data.put("message", "아이디 또는 비밀번호가 일치하지 않습니다.");
+	    	data.put("message", "아이디 또는 비밀번호가 일치하지 않습니다.");
 	    }
 	    
 	    return data;
@@ -93,4 +98,33 @@ public class UserController {
 	    return "userList";
 	}
 	
+	@ResponseBody
+	@RequestMapping(value="/user/deactivate", method=RequestMethod.POST)
+	public HashMap<String, String> deactivateUsers(@RequestBody ArrayList<String> userIds) {
+	    HashMap<String, String> data = new HashMap<>();
+	    DB db = new DB();
+	    try {
+	        db.deactivateUsers(userIds);
+	        data.put("message", "선택 계정이 비활성화되었습니다.");
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	        data.put("message", "계정 비활성화에 실패했습니다.");
+	    }
+	    return data;
+	}
+
+	@ResponseBody
+	@RequestMapping(value="/user/update", method=RequestMethod.PUT)
+	public HashMap<String, String> updateUser(@RequestBody User user) {
+	    HashMap<String, String> data = new HashMap<>();
+	    DB db = new DB();
+	    try {
+	        db.updateUser(user);
+	        data.put("message", "회원 정보가 수정되었습니다.");
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	        data.put("message", "회원 정보 수정에 실패했습니다.");
+	    }
+	    return data;
+	}
 }

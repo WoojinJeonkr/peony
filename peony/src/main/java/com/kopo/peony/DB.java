@@ -60,7 +60,19 @@ public class DB {
 
 	public void createTable() {
 		this.open();
-		String query = "CREATE TABLE user (idx INTEGER PRIMARY KEY AUTOINCREMENT, id TEXT, pwd TEXT, userType TEXT, name TEXT, phone TEXT, address TEXT, created TEXT, lastUpdated TEXT);";
+		String query = "CREATE TABLE IF NOT EXISTS user ("
+		        + "idx INTEGER PRIMARY KEY AUTOINCREMENT, "
+		        + "id TEXT UNIQUE NOT NULL, "
+		        + "pwd TEXT NOT NULL, "
+		        + "userType TEXT NOT NULL, "
+		        + "name TEXT NOT NULL, "
+		        + "phone TEXT NOT NULL, "
+		        + "address TEXT NOT NULL, "
+		        + "status TEXT DEFAULT 'ACTIVE', "
+		        + "created TEXT NOT NULL, "
+		        + "lastUpdated TEXT NOT NULL, "
+		        + "deletedAt TEXT"
+		        + ");";
 		try {
 			Statement statement = this.connection.createStatement();
 			statement.executeUpdate(query);
@@ -73,18 +85,20 @@ public class DB {
 	
 	public void insertData(User user) {
 		this.open();
-		String query = "INSERT INTO user (id, pwd, userType, name, phone, address, created, lastUpdated) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+		String query = "INSERT INTO user (id, pwd, userType, name, phone, address, status, created, lastUpdated, deletedAt) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 		try {
 			PreparedStatement statement = this.connection.prepareStatement(query);
 			statement.setString(1, user.id);
-			statement.setString(2, user.pwd);
-			statement.setString(3, user.userType);
-			statement.setString(4, user.name);
-			statement.setString(5, user.phone);
-			statement.setString(6, user.address);
-			String now = (new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss")).format(new java.util.Date());
-			statement.setString(7, now);
-			statement.setString(8, now);
+	        statement.setString(2, user.pwd);
+	        statement.setString(3, user.userType);
+	        statement.setString(4, user.name);
+	        statement.setString(5, user.phone);
+	        statement.setString(6, user.address);
+	        statement.setString(7, "ACTIVE");
+	        String now = (new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss")).format(new java.util.Date());
+	        statement.setString(8, now);
+	        statement.setString(9, now);
+	        statement.setString(10, null);
 			statement.execute();
 			statement.close();
 		} catch (Exception e) {
@@ -110,8 +124,10 @@ public class DB {
 	                    rs.getString("name"),
 	                    rs.getString("phone"),
 	                    rs.getString("address"),
+	                    rs.getString("status"),
 	                    rs.getString("created"),
-	                    rs.getString("lastUpdated")
+	                    rs.getString("lastUpdated"),
+	                    rs.getString("deletedAt")
 	                );
 	        }
 	        rs.close();
@@ -139,9 +155,11 @@ public class DB {
 				String name = result.getString("name");
 				String phone = result.getString("phone");
 				String address = result.getString("address");
+				String status = result.getString("status");
 				String created = result.getString("created");
 				String lastUpdated = result.getString("lastUpdated");
-				data.add(new User(idx, id, pwd, userType, name, phone, address, created, lastUpdated));
+				String deletedAt = result.getString("deletedAt");
+				data.add(new User(idx, id, pwd, userType, name, phone, address, status, created, lastUpdated, deletedAt));
 			}
 			statement.close();
 		} catch (Exception e) {
@@ -149,5 +167,48 @@ public class DB {
 		}
 		this.close();
 		return data;
+	}
+	
+	public void deactivateUsers(ArrayList<String> userIds) {
+	    this.open();
+	    String query = "UPDATE user SET status = 'DELETED', deletedAt = ? WHERE id = ?";
+	    String now = new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
+	                        .format(new java.util.Date());
+	    try {
+	        PreparedStatement statement = this.connection.prepareStatement(query);
+	        for (String userId : userIds) {
+	            statement.setString(1, now);
+	            statement.setString(2, userId);
+	            statement.addBatch();
+	        }
+	        statement.executeBatch();
+	        statement.close();
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	    } finally {
+	        this.close();
+	    }
+	}
+	
+	public void updateUser(User user) {
+	    this.open();
+	    String query = "UPDATE user SET phone = ?, address = ?, userType = ?, lastUpdated = ? "
+	                 + "WHERE id = ?";
+	    String now = new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
+	                        .format(new java.util.Date());
+	    try {
+	        PreparedStatement statement = this.connection.prepareStatement(query);
+	        statement.setString(1, user.getPhone());
+	        statement.setString(2, user.getAddress());
+	        statement.setString(3, user.getUserType());
+	        statement.setString(4, now);
+	        statement.setString(5, user.getId());
+	        statement.executeUpdate();
+	        statement.close();
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	    } finally {
+	        this.close();
+	    }
 	}
 }

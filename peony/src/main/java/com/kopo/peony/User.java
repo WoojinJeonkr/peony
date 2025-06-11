@@ -16,8 +16,10 @@ public class User {
 	String name;
 	String phone;
 	String address;
+	String status;
 	String created;
 	String lastUpdated;
+	String deletedAt;
 	
 	User(String id, String pwd) {
 		this.id = id;
