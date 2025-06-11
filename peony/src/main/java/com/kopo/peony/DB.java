@@ -2,6 +2,7 @@ package com.kopo.peony;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -62,6 +63,28 @@ public class DB {
 		try {
 			Statement statement = this.connection.createStatement();
 			statement.executeUpdate(query);
+			statement.close();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		this.close();
+	}
+	
+	public void insertData(User user) {
+		this.open();
+		String query = "INSERT INTO user (id, pwd, userType, name, phone, address, created, lastUpdated) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+		try {
+			PreparedStatement statement = this.connection.prepareStatement(query);
+			statement.setString(1, user.id);
+			statement.setString(2, user.pwd);
+			statement.setString(3, user.userType);
+			statement.setString(4, user.name);
+			statement.setString(5, user.phone);
+			statement.setString(6, user.address);
+			String now = (new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss")).format(new java.util.Date());
+			statement.setString(7, now);
+			statement.setString(8, now);
+			statement.execute();
 			statement.close();
 		} catch (Exception e) {
 			e.printStackTrace();
