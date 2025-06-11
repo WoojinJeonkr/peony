@@ -10,6 +10,13 @@ public class HomeController {
 	
 	@RequestMapping(value = "/", method = RequestMethod.GET)
 	public String home(Model model) {
+		
+		DB db = new DB();
+		
+		if (!db.isPreparingTable("user")) {
+	        db.createTable();
+	    }
+		
 		return "home";
 	}
 	
