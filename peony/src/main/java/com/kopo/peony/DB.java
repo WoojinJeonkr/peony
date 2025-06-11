@@ -91,4 +91,35 @@ public class DB {
 		}
 		this.close();
 	}
+	
+	public User getUserInfo(String id) {
+		this.open();
+		User user = null;
+		try {
+			String query = "SELECT * FROM user where id = ?";
+			PreparedStatement statement = this.connection.prepareStatement(query);
+			statement.setString(1, id);
+	        ResultSet rs = statement.executeQuery();
+	        if (rs.next()) {
+	        	user = new User(
+	                    rs.getInt("idx"),
+	                    rs.getString("id"),
+	                    rs.getString("pwd"),
+	                    rs.getString("userType"),
+	                    rs.getString("name"),
+	                    rs.getString("phone"),
+	                    rs.getString("address"),
+	                    rs.getString("created"),
+	                    rs.getString("lastUpdated")
+	                );
+	        }
+	        rs.close();
+	        statement.close();
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	    } finally {
+	        this.close();
+	    }
+	    return user;
+	}
 }

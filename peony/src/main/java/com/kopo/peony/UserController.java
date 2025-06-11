@@ -2,6 +2,9 @@ package com.kopo.peony;
 
 import java.util.HashMap;
 
+import javax.servlet.http.HttpSession;
+
+import org.mindrot.jbcrypt.BCrypt;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -42,6 +45,36 @@ public class UserController {
 	    
 	    return data;
 	    
+	}
+	
+	@RequestMapping(value="/login")
+	public String moveLoginPage() {
+		return "login";
+	}
+	
+	@ResponseBody
+	@RequestMapping(value="/login", method = RequestMethod.POST)
+	public HashMap<String, String> login(@RequestParam("id") String id, @RequestParam("pwd") String pwd, HttpSession session) {
+		HashMap<String, String> data = new HashMap<>();
+	    DB db = new DB();
+	    User user = db.getUserInfo(id);
+
+	    if (user != null && BCrypt.checkpw(pwd, user.getPwd())) {
+	    	session.setAttribute("user", user);
+	        data.put("message", "로그인 성공");
+	        data.put("name", user.getName());
+	        data.put("userType", user.getUserType());
+	    } else {
+	        data.put("message", "아이디 또는 비밀번호가 일치하지 않습니다.");
+	    }
+	    
+	    return data;
+	}
+	
+	@RequestMapping("/logout")
+	public String logout(HttpSession session) {
+	    session.invalidate();
+	    return "redirect:/";
 	}
 	
 }
