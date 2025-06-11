@@ -31,23 +31,23 @@
 	}
 </style>
 <body>
-<div class="container">
+	<div class="container">
 		<div class="row justify-content-center">
 			<div class="col-md-10">
 				<c:if test="${empty sessionScope.user}">
-	                <div class="alert alert-info d-flex align-items-center justify-content-center mb-4" role="alert" style="max-width: 800px; margin: 0 auto;">
-	                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="#0dcaf0" class="bi bi-info-circle me-2" viewBox="0 0 16 16">
-	                    <path d="M8 15A7 7 0 1 0 8 1a7 7 0 0 0 0 14zm0 1A8 8 0 1 1 8 0a8 8 0 0 1 0 16z"/>
-	                    <path d="m8.93 6.588-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 .877-.252 1.02-.598l.088-.416c.073-.34.217-.466.465-.466.288 0 .352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 .877-.252 1.02-.598l.088-.416c.073-.34.217-.466.465-.466.288 0 .352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 .877-.252 1.02-.598l.088-.416c.073-.34.217-.466.465-.466z"/>
-	                    <circle cx="8" cy="4.5" r="1"/>
-	                  </svg>
-	                  <span class="fw-semibold">
-	                    현재 <b>비회원 상태</b>입니다. 
-	                    <a href="/login" class="alert-link">로그인</a> 또는 
-	                    <a href="/register" class="alert-link">회원가입</a> 후 더 많은 서비스를 이용해보세요!
-	                  </span>
-	                </div>
-	            </c:if>
+		               <div class="alert alert-info d-flex align-items-center justify-content-center mb-4" role="alert" style="max-width: 800px; margin: 0 auto;">
+		                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="#0dcaf0" class="bi bi-info-circle me-2" viewBox="0 0 16 16">
+		                   <path d="M8 15A7 7 0 1 0 8 1a7 7 0 0 0 0 14zm0 1A8 8 0 1 1 8 0a8 8 0 0 1 0 16z"/>
+		                   <path d="m8.93 6.588-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 .877-.252 1.02-.598l.088-.416c.073-.34.217-.466.465-.466.288 0 .352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 .877-.252 1.02-.598l.088-.416c.073-.34.217-.466.465-.466.288 0 .352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 .877-.252 1.02-.598l.088-.416c.073-.34.217-.466.465-.466z"/>
+		                   <circle cx="8" cy="4.5" r="1"/>
+		                 </svg>
+		                 <span class="fw-semibold">
+		                   현재 <b>비회원 상태</b>입니다. 
+		                   <a href="/login" class="alert-link">로그인</a> 또는 
+		                   <a href="/register" class="alert-link">회원가입</a> 후 더 많은 서비스를 이용해보세요!
+		                 </span>
+		               </div>
+		           </c:if>
 				<div class="card main-card">
 					<c:if test="${not empty sessionScope.user}">
 				        <div class="d-flex justify-content-between align-items-center px-4 pt-3 pb-2" style="border-bottom:1px solid #eee;">
