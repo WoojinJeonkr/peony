@@ -1,11 +1,13 @@
 package com.kopo.peony;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 import javax.servlet.http.HttpSession;
 
 import org.mindrot.jbcrypt.BCrypt;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -14,13 +16,13 @@ import org.springframework.web.bind.annotation.ResponseBody;
 @Controller
 public class UserController {
 	
-	@RequestMapping(value="/register", method = RequestMethod.GET)
+	@RequestMapping(value="/user/register", method = RequestMethod.GET)
 	public String register() {
 		return "register";
 	}
 	
 	@ResponseBody
-	@RequestMapping(value="/insert", method = RequestMethod.POST)
+	@RequestMapping(value="/user/insert", method = RequestMethod.POST)
 	public HashMap<String, String> insert(@RequestParam("id") String id, @RequestParam("pwd") String pwd,
 	                                    @RequestParam("name") String name, @RequestParam("phone") String phone,
 	                                    @RequestParam("address") String address) {
@@ -75,6 +77,20 @@ public class UserController {
 	public String logout(HttpSession session) {
 	    session.invalidate();
 	    return "redirect:/";
+	}
+	
+	@RequestMapping("/user/list")
+	public String moveUserListPage(Model model, HttpSession session) {
+	    User currentUser = (User) session.getAttribute("user");
+	    if(currentUser == null || !"admin".equals(currentUser.getUserType())) {
+	        return "redirect:/";
+	    }
+	    
+	    DB db = new DB();
+	    ArrayList<User> userList = db.selectAllUsers();
+	    model.addAttribute("users", userList);
+	    
+	    return "userList";
 	}
 	
 }

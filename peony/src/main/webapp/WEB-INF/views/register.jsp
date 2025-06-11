@@ -50,7 +50,7 @@
 	    e.preventDefault();
 		$.ajax({
 			type: 'POST',
-			url: '/insert',
+			url: '/user/insert',
 			data: $(this).serialize(),
 			success: function(data) {
 				alert(data.message);

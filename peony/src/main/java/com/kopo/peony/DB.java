@@ -6,6 +6,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
 
 import org.sqlite.SQLiteConfig;
 
@@ -121,5 +122,32 @@ public class DB {
 	        this.close();
 	    }
 	    return user;
+	}
+	
+	public ArrayList<User> selectAllUsers() {
+		this.open();
+		ArrayList<User> data = new ArrayList<>();
+		try {
+			String query = "SELECT * FROM user";
+			PreparedStatement statement = this.connection.prepareStatement(query);
+			ResultSet result = statement.executeQuery();
+			while (result.next()) {
+				int idx = result.getInt("idx");
+				String userType = result.getString("userType");
+				String id = result.getString("id");
+				String pwd = result.getString("pwd");
+				String name = result.getString("name");
+				String phone = result.getString("phone");
+				String address = result.getString("address");
+				String created = result.getString("created");
+				String lastUpdated = result.getString("lastUpdated");
+				data.add(new User(idx, id, pwd, userType, name, phone, address, created, lastUpdated));
+			}
+			statement.close();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		this.close();
+		return data;
 	}
 }

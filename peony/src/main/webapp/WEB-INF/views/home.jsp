@@ -44,7 +44,7 @@
 		                 <span class="fw-semibold">
 		                   현재 <b>비회원 상태</b>입니다. 
 		                   <a href="/login" class="alert-link">로그인</a> 또는 
-		                   <a href="/register" class="alert-link">회원가입</a> 후 더 많은 서비스를 이용해보세요!
+		                   <a href="/user/register" class="alert-link">회원가입</a> 후 더 많은 서비스를 이용해보세요!
 		                 </span>
 		               </div>
 		           </c:if>
@@ -61,6 +61,9 @@
 				                </span>
 				            </div>
 				            <div>
+				            	<c:if test="${sessionScope.user.userType eq 'admin'}">
+					                <a href="/user/list" class="btn btn-outline-info btn-sm">회원목록 관리</a>
+					            </c:if>
 				                <a href="/logout" class="btn btn-outline-secondary btn-sm ms-2">로그아웃</a>
 				            </div>
 				        </div>
