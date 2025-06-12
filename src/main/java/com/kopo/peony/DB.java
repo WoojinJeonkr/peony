@@ -24,7 +24,7 @@ public class DB {
 
 	private void open() {
 		try {
-			String dbFileName = "D:/sts-bundle/dbdata/peony.sqlite";
+			String dbFileName = "H:/sts-bundle/dbdata/peony.sqlite";
 			SQLiteConfig config = new SQLiteConfig();
 			this.connection = DriverManager.getConnection("jdbc:sqlite:/" + dbFileName, config.toProperties());
 		} catch (SQLException e) {
