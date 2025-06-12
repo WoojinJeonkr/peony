@@ -8,36 +8,67 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 
+import javax.annotation.PostConstruct;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import org.sqlite.SQLiteConfig;
 
+@Component
 public class DB {
 	
-	private Connection connection;
-
-	static {
-		try {
-			Class.forName("org.sqlite.JDBC");
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
-
-	private void open() {
-		try {
-			String dbFileName = "H:/sts-bundle/dbdata/peony.sqlite";
-			SQLiteConfig config = new SQLiteConfig();
-			this.connection = DriverManager.getConnection("jdbc:sqlite:/" + dbFileName, config.toProperties());
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-	}
+	@Autowired
+    private DatabaseInitializer databaseInitializer;
+    
+    private Connection connection;
+    
+    @SuppressWarnings("unused")
+    private boolean initialized = false;
+    
+    static {
+        try {
+            Class.forName("org.sqlite.JDBC");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+    
+    @PostConstruct
+    public void initDatabase() {
+    	try {
+            boolean initResult = databaseInitializer.initializeDatabase();
+            if (initResult) {
+                this.open();
+                this.initialized = true;
+            } else {
+                this.initialized = false;
+            }
+        } catch (Exception e) {
+            System.out.println("데이터베이스 초기화 실패: " + e.getMessage());
+            this.initialized = false;
+        }
+    }
+    
+    private void open() {
+        try {
+            String fullPath = databaseInitializer.getDatabasePath();
+            SQLiteConfig config = new SQLiteConfig();
+            this.connection = DriverManager.getConnection("jdbc:sqlite:" + fullPath, config.toProperties());
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
 
 	private void close() {
-		try {
-			this.connection.close();
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
+		if (connection != null) {
+	        try {
+	            connection.close();
+	        } catch (SQLException e) {
+	            e.printStackTrace();
+	        } finally {
+	            connection = null;
+	        }
+	    }
 	}
 	
 	public boolean isPreparingTable(String tableName) {
