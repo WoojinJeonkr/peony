@@ -98,7 +98,86 @@ local.properties
 application-dev.properties
 application-local.yml
 
-# database files
-./data/
+# Database files
+data/
 *.sqlite
 *.sqlite3
+*.db
+
+# Spring Legacy specific
+*.launch
+.recommenders/
+.metadata/
+.loadpath
+.factorypath
+
+# Spring Boot compatibility (if upgrading later)
+.apt_generated/
+.apt_generated_test/
+
+# Web application temporary files
+/src/main/webapp/WEB-INF/classes/
+
+# IntelliJ IDEA (team members might use)
+.idea/
+*.iml
+*.iws
+*.ipr
+
+# Visual Studio Code
+.vscode/
+
+# NetBeans
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+
+# Enhanced logging
+logs/
+*.log.*
+*.out
+
+# Temporary files enhancement
+tmp/
+temp/
+.tmp/
+
+# Sensitive configuration files
+*-local.properties
+*-dev.properties
+*-prod.properties
+config/local/
+secrets/
+credentials/
+
+# API keys and sensitive data
+.env
+.env.local
+*.key
+
+# Additional build tools
+.gradle/
+build/
+out/
+
+# Deployment related
+deploy/
+dist/
+*.war.original
+
+# Tomcat specific
+work/
+*.pid
+
+# JBoss/WildFly
+standalone/deployments/
+
+# Performance profiling
+*.hprof
+*.heap
+
+# Documentation
+javadoc/
+docs/build/
