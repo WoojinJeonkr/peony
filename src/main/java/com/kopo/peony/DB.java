@@ -72,7 +72,7 @@ public class DB {
 	}
 	
 	public boolean isPreparingTable(String tableName) {
-	    this.open();
+		this.open();
 	    boolean isExist = false;
 	    String query = "SELECT name FROM sqlite_master WHERE type='table' AND name='" + tableName + "';";
 	    try {
@@ -203,7 +203,7 @@ public class DB {
 	
 	// 활성 회원 조회
 	public ArrayList<User> selectActiveUsers() {
-	    this.open();
+		this.open();
 	    ArrayList<User> data = new ArrayList<>();
 	    try {
 	        String query = "SELECT * FROM user WHERE status = 'ACTIVE'";
@@ -233,7 +233,7 @@ public class DB {
 	
 	// 탈퇴 회원 조회
 	public ArrayList<User> selectDeletedUsers() {
-	    this.open();
+		this.open();
 	    ArrayList<User> data = new ArrayList<>();
 	    try {
 	        String query = "SELECT * FROM user WHERE status = 'DELETED'";
@@ -262,7 +262,7 @@ public class DB {
 	}
 	
 	public void deactivateUsers(ArrayList<String> userIds) {
-	    this.open();
+		this.open();
 	    String query = "UPDATE user SET status = 'DELETED', deletedAt = ? WHERE id = ?";
 	    String now = new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
 	                        .format(new java.util.Date());
@@ -283,7 +283,7 @@ public class DB {
 	}
 	
 	public void updateUser(User user) {
-	    this.open();
+		this.open();
 	    String query = "UPDATE user SET phone = ?, address = ?, userType = ?, lastUpdated = ? "
 	                 + "WHERE id = ?";
 	    String now = new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss")

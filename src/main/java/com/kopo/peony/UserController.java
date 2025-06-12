@@ -6,6 +6,7 @@ import java.util.HashMap;
 import javax.servlet.http.HttpSession;
 
 import org.mindrot.jbcrypt.BCrypt;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -15,6 +16,9 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 @Controller
 public class UserController {
+	
+	@Autowired
+	private DB db;
 	
 	@RequestMapping(value="/user/register", method = RequestMethod.GET)
 	public String register() {
@@ -28,7 +32,6 @@ public class UserController {
 	                                    @RequestParam("address") String address) {
 		
 	    HashMap<String, String> data = new HashMap<>();
-	    DB db = new DB();
 	    String userType = "user";
 	    
 	    if (id.startsWith("admin")) {
@@ -58,7 +61,6 @@ public class UserController {
 	@RequestMapping(value="/login", method = RequestMethod.POST)
 	public HashMap<String, String> login(@RequestParam("id") String id, @RequestParam("pwd") String pwd, HttpSession session) {
 		HashMap<String, String> data = new HashMap<>();
-	    DB db = new DB();
 	    User user = db.getUserInfo(id);
 
 	    if (user != null && BCrypt.checkpw(pwd, user.getPwd())) {
@@ -106,7 +108,6 @@ public class UserController {
 	    }
 	    
 	    try {
-	        DB db = new DB();
 	        ArrayList<User> userList = db.selectAllUsers();
 	        data.put("success", true);
 	        data.put("users", userList);
@@ -132,7 +133,7 @@ public class UserController {
 	    }
 	    
 	    try {
-	        DB db = new DB();
+	        
 	        ArrayList<User> userList = db.selectActiveUsers();
 	        data.put("success", true);
 	        data.put("users", userList);
@@ -158,7 +159,7 @@ public class UserController {
 	    }
 	    
 	    try {
-	        DB db = new DB();
+	        
 	        ArrayList<User> userList = db.selectDeletedUsers();
 	        data.put("success", true);
 	        data.put("users", userList);
@@ -175,7 +176,7 @@ public class UserController {
 	@RequestMapping(value="/user/deactivate", method=RequestMethod.POST)
 	public HashMap<String, String> deactivateUsers(@RequestBody ArrayList<String> userIds) {
 	    HashMap<String, String> data = new HashMap<>();
-	    DB db = new DB();
+	    
 	    try {
 	        db.deactivateUsers(userIds);
 	        data.put("message", "선택 계정이 비활성화되었습니다.");
@@ -190,7 +191,7 @@ public class UserController {
 	@RequestMapping(value="/user/update", method=RequestMethod.PUT)
 	public HashMap<String, String> updateUser(@RequestBody User user) {
 	    HashMap<String, String> data = new HashMap<>();
-	    DB db = new DB();
+	    
 	    try {
 	        db.updateUser(user);
 	        data.put("message", "회원 정보가 수정되었습니다.");
