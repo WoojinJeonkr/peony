@@ -205,7 +205,6 @@ public class UserController {
 	@RequestMapping(value="/user/mypage", method = RequestMethod.GET)
 	public String moveMyPage(HttpSession session) {
 	    User currentUser = (User) session.getAttribute("user");
-	    System.out.println(currentUser);
 	    if(currentUser == null) {
 	        return "redirect:/login";
 	    }

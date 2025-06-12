@@ -20,10 +20,10 @@ public class DB {
 	@Autowired
     private DatabaseInitializer databaseInitializer;
     
-    private Connection connection;
-    
     @SuppressWarnings("unused")
     private boolean initialized = false;
+    
+    private String databaseUrl; 
     
     static {
         try {
@@ -38,59 +38,40 @@ public class DB {
     	try {
             boolean initResult = databaseInitializer.initializeDatabase();
             if (initResult) {
-                this.open();
+            	this.databaseUrl = "jdbc:sqlite:" + databaseInitializer.getDatabasePath();
                 this.initialized = true;
             } else {
                 this.initialized = false;
             }
         } catch (Exception e) {
             System.out.println("데이터베이스 초기화 실패: " + e.getMessage());
+            e.printStackTrace();
             this.initialized = false;
         }
     }
     
-    private void open() {
-        try {
-            String fullPath = databaseInitializer.getDatabasePath();
-            SQLiteConfig config = new SQLiteConfig();
-            this.connection = DriverManager.getConnection("jdbc:sqlite:" + fullPath, config.toProperties());
+    private Connection getConnection() throws SQLException {
+        if (this.databaseUrl == null) {
+            throw new SQLException("Database URL is not initialized. Ensure initDatabase() runs successfully.");
+        }
+        SQLiteConfig config = new SQLiteConfig();
+        return DriverManager.getConnection(this.databaseUrl, config.toProperties());
+    }
+    
+	public boolean isPreparingTable(String tableName) {
+	    boolean isExist = false;
+	    String query = "SELECT name FROM sqlite_master WHERE type='table' AND name='" + tableName + "';";
+	    try (Connection connection = getConnection();
+	    	Statement statement = connection.createStatement();
+    		ResultSet rs = statement.executeQuery(query)) {
+	    	isExist = rs.next();
         } catch (SQLException e) {
             e.printStackTrace();
         }
-    }
-
-	private void close() {
-		if (connection != null) {
-	        try {
-	            connection.close();
-	        } catch (SQLException e) {
-	            e.printStackTrace();
-	        } finally {
-	            connection = null;
-	        }
-	    }
-	}
-	
-	public boolean isPreparingTable(String tableName) {
-		this.open();
-	    boolean isExist = false;
-	    String query = "SELECT name FROM sqlite_master WHERE type='table' AND name='" + tableName + "';";
-	    try {
-	        Statement statement = this.connection.createStatement();
-	        ResultSet rs = statement.executeQuery(query);
-	        isExist = rs.next();
-	        rs.close();
-	        statement.close();
-	    } catch (Exception e) {
-	        e.printStackTrace();
-	    } finally {
-	        this.close();
-	    }
-	    return isExist;
+        return isExist;
 	}
 
 	public void createTable() {
-		this.open();
 		String query = "CREATE TABLE IF NOT EXISTS user ("
 		        + "idx INTEGER PRIMARY KEY AUTOINCREMENT, "
 		        + "id TEXT UNIQUE NOT NULL, "
@@ -104,81 +85,72 @@ public class DB {
 		        + "lastUpdated TEXT NOT NULL, "
 		        + "deletedAt TEXT"
 		        + ");";
-		try {
-			Statement statement = this.connection.createStatement();
+		try (Connection connection = getConnection();
+             Statement statement = connection.createStatement()) {
 			statement.executeUpdate(query);
-			statement.close();
-		} catch (Exception e) {
+		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-		this.close();
 	}
 	
 	public void insertData(User user) {
-		this.open();
 		String query = "INSERT INTO user (id, pwd, userType, name, phone, address, status, created, lastUpdated, deletedAt) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-		try {
-			PreparedStatement statement = this.connection.prepareStatement(query);
+		try (Connection connection = getConnection();
+             PreparedStatement statement = connection.prepareStatement(query)) {
 			statement.setString(1, user.id);
-	        statement.setString(2, user.pwd);
-	        statement.setString(3, user.userType);
-	        statement.setString(4, user.name);
-	        statement.setString(5, user.phone);
-	        statement.setString(6, user.address);
-	        statement.setString(7, "ACTIVE");
-	        String now = (new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss")).format(new java.util.Date());
-	        statement.setString(8, now);
-	        statement.setString(9, now);
-	        statement.setString(10, null);
+			statement.setString(2, user.pwd);
+			statement.setString(3, user.userType);
+			statement.setString(4, user.name);
+			statement.setString(5, user.phone);
+			statement.setString(6, user.address);
+			statement.setString(7, "ACTIVE");
+			String now = (new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss")).format(new java.util.Date());
+			statement.setString(8, now);
+			statement.setString(9, now);
+			statement.setString(10, null);
 			statement.execute();
-			statement.close();
-		} catch (Exception e) {
+		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-		this.close();
 	}
 	
 	public User getUserInfo(String id) {
-		this.open();
 		User user = null;
-		try {
-			String query = "SELECT * FROM user where id = ?";
-			PreparedStatement statement = this.connection.prepareStatement(query);
+		String query = "SELECT * FROM user where id = ?";
+		try (Connection connection = getConnection();
+             PreparedStatement statement = connection.prepareStatement(query)) {
 			statement.setString(1, id);
-	        ResultSet rs = statement.executeQuery();
-	        if (rs.next()) {
-	        	user = new User(
-	                    rs.getInt("idx"),
-	                    rs.getString("id"),
-	                    rs.getString("pwd"),
-	                    rs.getString("userType"),
-	                    rs.getString("name"),
-	                    rs.getString("phone"),
-	                    rs.getString("address"),
-	                    rs.getString("status"),
-	                    rs.getString("created"),
-	                    rs.getString("lastUpdated"),
-	                    rs.getString("deletedAt")
-	                );
-	        }
-	        rs.close();
-	        statement.close();
-	    } catch (Exception e) {
-	        e.printStackTrace();
-	    } finally {
-	        this.close();
-	    }
-	    return user;
+			try (ResultSet rs = statement.executeQuery()) {
+				if (rs.next()) {
+					user = new User(
+							rs.getInt("idx"),
+							rs.getString("id"),
+							rs.getString("pwd"),
+							rs.getString("userType"),
+							rs.getString("name"),
+							rs.getString("phone"),
+							rs.getString("address"),
+							rs.getString("status"),
+							rs.getString("created"),
+							rs.getString("lastUpdated"),
+							rs.getString("deletedAt")
+						);
+				}
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		
+		return user;
 	}
 	
 	// 전체 회원 조회
 	public ArrayList<User> selectAllUsers() {
-		this.open();
 		ArrayList<User> data = new ArrayList<>();
-		try {
-			String query = "SELECT * FROM user";
-			PreparedStatement statement = this.connection.prepareStatement(query);
-			ResultSet result = statement.executeQuery();
+		String query = "SELECT * FROM user";
+		try (Connection connection = getConnection();
+			PreparedStatement statement = connection.prepareStatement(query);
+			ResultSet result = statement.executeQuery()) {
 			while (result.next()) {
 				int idx = result.getInt("idx");
 				String userType = result.getString("userType");
@@ -193,135 +165,112 @@ public class DB {
 				String deletedAt = result.getString("deletedAt");
 				data.add(new User(idx, id, pwd, userType, name, phone, address, status, created, lastUpdated, deletedAt));
 			}
-			statement.close();
-		} catch (Exception e) {
+		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-		this.close();
 		return data;
 	}
 	
 	// 활성 회원 조회
 	public ArrayList<User> selectActiveUsers() {
-		this.open();
 	    ArrayList<User> data = new ArrayList<>();
-	    try {
-	        String query = "SELECT * FROM user WHERE status = 'ACTIVE'";
-	        PreparedStatement statement = this.connection.prepareStatement(query);
-	        ResultSet result = statement.executeQuery();
-	        while (result.next()) {
-	            int idx = result.getInt("idx");
-	            String userType = result.getString("userType");
-	            String id = result.getString("id");
-	            String pwd = result.getString("pwd");
-	            String name = result.getString("name");
-	            String phone = result.getString("phone");
-	            String address = result.getString("address");
-	            String status = result.getString("status");
-	            String created = result.getString("created");
-	            String lastUpdated = result.getString("lastUpdated");
-	            String deletedAt = result.getString("deletedAt");
-	            data.add(new User(idx, id, pwd, userType, name, phone, address, status, created, lastUpdated, deletedAt));
-	        }
-	        statement.close();
-	    } catch (Exception e) {
-	        e.printStackTrace();
-	    }
-	    this.close();
-	    return data;
+	    String query = "SELECT * FROM user WHERE status = 'ACTIVE'";
+	    try (Connection connection = getConnection();
+		PreparedStatement statement = connection.prepareStatement(query);
+		ResultSet result = statement.executeQuery()) {
+			while (result.next()) {
+				int idx = result.getInt("idx");
+				String userType = result.getString("userType");
+				String id = result.getString("id");
+				String pwd = result.getString("pwd");
+				String name = result.getString("name");
+				String phone = result.getString("phone");
+				String address = result.getString("address");
+				String status = result.getString("status");
+				String created = result.getString("created");
+				String lastUpdated = result.getString("lastUpdated");
+				String deletedAt = result.getString("deletedAt");
+				data.add(new User(idx, id, pwd, userType, name, phone, address, status, created, lastUpdated, deletedAt));
+			}
+	    } catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return data;
 	}
 	
 	// 탈퇴 회원 조회
 	public ArrayList<User> selectDeletedUsers() {
-		this.open();
-	    ArrayList<User> data = new ArrayList<>();
-	    try {
-	        String query = "SELECT * FROM user WHERE status = 'DELETED'";
-	        PreparedStatement statement = this.connection.prepareStatement(query);
-	        ResultSet result = statement.executeQuery();
-	        while (result.next()) {
-	            int idx = result.getInt("idx");
-	            String userType = result.getString("userType");
-	            String id = result.getString("id");
-	            String pwd = result.getString("pwd");
-	            String name = result.getString("name");
-	            String phone = result.getString("phone");
-	            String address = result.getString("address");
-	            String status = result.getString("status");
-	            String created = result.getString("created");
-	            String lastUpdated = result.getString("lastUpdated");
-	            String deletedAt = result.getString("deletedAt");
-	            data.add(new User(idx, id, pwd, userType, name, phone, address, status, created, lastUpdated, deletedAt));
-	        }
-	        statement.close();
-	    } catch (Exception e) {
-	        e.printStackTrace();
-	    }
-	    this.close();
-	    return data;
+		ArrayList<User> data = new ArrayList<>();
+		String query = "SELECT * FROM user WHERE status = 'DELETED'";
+		try (Connection connection = getConnection();
+			PreparedStatement statement = connection.prepareStatement(query);
+			ResultSet result = statement.executeQuery()) {
+			while (result.next()) {
+				int idx = result.getInt("idx");
+				String userType = result.getString("userType");
+				String id = result.getString("id");
+				String pwd = result.getString("pwd");
+				String name = result.getString("name");
+				String phone = result.getString("phone");
+				String address = result.getString("address");
+				String status = result.getString("status");
+				String created = result.getString("created");
+				String lastUpdated = result.getString("lastUpdated");
+				String deletedAt = result.getString("deletedAt");
+				data.add(new User(idx, id, pwd, userType, name, phone, address, status, created, lastUpdated, deletedAt));
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return data;
 	}
 	
 	public void deactivateUsers(ArrayList<String> userIds) {
-		this.open();
-	    String query = "UPDATE user SET status = 'DELETED', deletedAt = ? WHERE id = ?";
-	    String now = new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
-	                        .format(new java.util.Date());
-	    try {
-	        PreparedStatement statement = this.connection.prepareStatement(query);
-	        for (String userId : userIds) {
-	            statement.setString(1, now);
-	            statement.setString(2, userId);
-	            statement.addBatch();
-	        }
-	        statement.executeBatch();
-	        statement.close();
-	    } catch (Exception e) {
-	        e.printStackTrace();
-	    } finally {
-	        this.close();
-	    }
+		String query = "UPDATE user SET status = 'DELETED', deletedAt = ? WHERE id = ?";
+		String now = new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new java.util.Date());
+		try (Connection connection = getConnection();
+			PreparedStatement statement = connection.prepareStatement(query)) {
+			for (String userId : userIds) {
+				statement.setString(1, now);
+				statement.setString(2, userId);
+				statement.addBatch();
+			}
+			statement.executeBatch();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
 	}
 	
 	public void updateUser(User user) {
-		this.open();
-	    String query = "UPDATE user SET phone = ?, address = ?, userType = ?, lastUpdated = ? "
-	                 + "WHERE id = ?";
-	    String now = new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
-	                        .format(new java.util.Date());
-	    try {
-	        PreparedStatement statement = this.connection.prepareStatement(query);
-	        statement.setString(1, user.getPhone());
-	        statement.setString(2, user.getAddress());
-	        statement.setString(3, user.getUserType());
-	        statement.setString(4, now);
-	        statement.setString(5, user.getId());
-	        statement.executeUpdate();
-	        statement.close();
-	    } catch (Exception e) {
-	        e.printStackTrace();
-	    } finally {
-	        this.close();
-	    }
+		String query = "UPDATE user SET phone = ?, address = ?, userType = ?, lastUpdated = ? "
+						+ "WHERE id = ?";
+		String now = new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new java.util.Date());
+		try (Connection connection = getConnection();
+			PreparedStatement statement = connection.prepareStatement(query)) {
+				statement.setString(1, user.getPhone());
+				statement.setString(2, user.getAddress());
+				statement.setString(3, user.getUserType());
+				statement.setString(4, now);
+				statement.setString(5, user.getId());
+				statement.executeUpdate();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
 	}
 	
 	public void updateMyInfo(User user) {
-	    this.open();
-	    String query = "UPDATE user SET name = ?, phone = ?, address = ?, lastUpdated = ? WHERE id = ?";
-	    String now = new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
-	                        .format(new java.util.Date());
-	    try {
-	        PreparedStatement statement = this.connection.prepareStatement(query);
-	        statement.setString(1, user.getName());
-	        statement.setString(2, user.getPhone());
-	        statement.setString(3, user.getAddress());
-	        statement.setString(4, now);
-	        statement.setString(5, user.getId());
-	        statement.executeUpdate();
-	        statement.close();
-	    } catch (Exception e) {
-	        e.printStackTrace();
-	    } finally {
-	        this.close();
-	    }
+		String query = "UPDATE user SET name = ?, phone = ?, address = ?, lastUpdated = ? WHERE id = ?";
+		String now = new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new java.util.Date());
+		try (Connection connection = getConnection();
+			PreparedStatement statement = connection.prepareStatement(query)) {
+				statement.setString(1, user.getName());
+				statement.setString(2, user.getPhone());
+				statement.setString(3, user.getAddress());
+				statement.setString(4, now);
+				statement.setString(5, user.getId());
+				statement.executeUpdate();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
 	}
 }
