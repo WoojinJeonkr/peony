@@ -303,4 +303,25 @@ public class DB {
 	        this.close();
 	    }
 	}
+	
+	public void updateMyInfo(User user) {
+	    this.open();
+	    String query = "UPDATE user SET name = ?, phone = ?, address = ?, lastUpdated = ? WHERE id = ?";
+	    String now = new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
+	                        .format(new java.util.Date());
+	    try {
+	        PreparedStatement statement = this.connection.prepareStatement(query);
+	        statement.setString(1, user.getName());
+	        statement.setString(2, user.getPhone());
+	        statement.setString(3, user.getAddress());
+	        statement.setString(4, now);
+	        statement.setString(5, user.getId());
+	        statement.executeUpdate();
+	        statement.close();
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	    } finally {
+	        this.close();
+	    }
+	}
 }

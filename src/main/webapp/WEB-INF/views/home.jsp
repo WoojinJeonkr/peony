@@ -64,6 +64,7 @@
 				            	<c:if test="${sessionScope.user.userType eq 'admin'}">
 					                <a href="/user/list" class="btn btn-outline-info btn-sm">회원목록 관리</a>
 					            </c:if>
+					            <a href="/user/mypage" class="btn btn-primary me-2">마이페이지</a>
 				                <a href="/logout" class="btn btn-outline-secondary btn-sm ms-2">로그아웃</a>
 				            </div>
 				        </div>

@@ -201,4 +201,75 @@ public class UserController {
 	    }
 	    return data;
 	}
+	
+	@RequestMapping(value="/user/mypage", method = RequestMethod.GET)
+	public String moveMyPage(HttpSession session) {
+	    User currentUser = (User) session.getAttribute("user");
+	    System.out.println(currentUser);
+	    if(currentUser == null) {
+	        return "redirect:/login";
+	    }
+	    return "mypage";
+	}
+	
+	@ResponseBody
+	@RequestMapping(value="/user/myinfo", method=RequestMethod.GET)
+	public HashMap<String, Object> getMyInfo(HttpSession session) {
+	    HashMap<String, Object> data = new HashMap<>();
+	    User currentUser = (User) session.getAttribute("user");
+	    
+	    if(currentUser == null) {
+	        data.put("success", false);
+	        data.put("message", "로그인이 필요합니다.");
+	        return data;
+	    }
+	    
+	    try {
+	        User user = db.getUserInfo(currentUser.getId());
+	        if(user != null) {
+	            data.put("success", true);
+	            data.put("user", user);
+	        } else {
+	            data.put("success", false);
+	            data.put("message", "사용자 정보를 찾을 수 없습니다.");
+	        }
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	        data.put("success", false);
+	        data.put("message", "사용자 정보 조회에 실패했습니다.");
+	    }
+	    
+	    return data;
+	}
+	
+	@ResponseBody
+	@RequestMapping(value="/user/myinfo/update", method=RequestMethod.PUT)
+	public HashMap<String, String> updateMyInfo(@RequestBody User user, HttpSession session) {
+	    HashMap<String, String> data = new HashMap<>();
+	    User currentUser = (User) session.getAttribute("user");
+	    
+	    if(currentUser == null) {
+	        data.put("message", "로그인이 필요합니다.");
+	        return data;
+	    }
+	    
+	    if(!currentUser.getId().equals(user.getId())) {
+	        data.put("message", "본인의 정보만 수정할 수 있습니다.");
+	        return data;
+	    }
+	    
+	    try {
+	        db.updateMyInfo(user);
+	        
+	        User updatedUser = db.getUserInfo(user.getId());
+	        session.setAttribute("user", updatedUser);
+	        
+	        data.put("message", "회원 정보가 성공적으로 수정되었습니다.");
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	        data.put("message", "회원 정보 수정에 실패했습니다.");
+	    }
+	    
+	    return data;
+	}
 }
