@@ -97,3 +97,8 @@ $RECYCLE.BIN/
 local.properties
 application-dev.properties
 application-local.yml
+
+# database files
+./data/
+*.sqlite
+*.sqlite3
