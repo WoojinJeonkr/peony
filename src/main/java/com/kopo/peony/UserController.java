@@ -85,17 +85,91 @@ public class UserController {
 	}
 	
 	@RequestMapping("/user/list")
-	public String moveUserListPage(Model model, HttpSession session) {
+	public String moveUserListPage(HttpSession session) {
 	    User currentUser = (User) session.getAttribute("user");
 	    if(currentUser == null || !"admin".equals(currentUser.getUserType())) {
 	        return "redirect:/";
 	    }
 	    
-	    DB db = new DB();
-	    ArrayList<User> userList = db.selectAllUsers();
-	    model.addAttribute("users", userList);
-	    
 	    return "userList";
+	}
+	
+	@ResponseBody
+	@RequestMapping(value="/user/list/all", method=RequestMethod.GET)
+	public HashMap<String, Object> getAllUsers(HttpSession session) {
+		HashMap<String, Object> data = new HashMap<>();
+	    User currentUser = (User) session.getAttribute("user");
+	    
+	    if(currentUser == null || !"admin".equals(currentUser.getUserType())) {
+	        data.put("success", false);
+	        data.put("message", "권한이 없습니다.");
+	        return data;
+	    }
+	    
+	    try {
+	        DB db = new DB();
+	        ArrayList<User> userList = db.selectAllUsers();
+	        data.put("success", true);
+	        data.put("users", userList);
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	        data.put("success", false);
+	        data.put("message", "회원 목록 조회에 실패했습니다.");
+	    }
+	    
+	    return data;
+	}
+	
+	@ResponseBody
+	@RequestMapping(value="/user/list/active", method=RequestMethod.GET)
+	public HashMap<String, Object> getActiveUsers(HttpSession session) {
+	    HashMap<String, Object> data = new HashMap<>();
+	    User currentUser = (User) session.getAttribute("user");
+	    
+	    if(currentUser == null || !"admin".equals(currentUser.getUserType())) {
+	        data.put("success", false);
+	        data.put("message", "권한이 없습니다.");
+	        return data;
+	    }
+	    
+	    try {
+	        DB db = new DB();
+	        ArrayList<User> userList = db.selectActiveUsers();
+	        data.put("success", true);
+	        data.put("users", userList);
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	        data.put("success", false);
+	        data.put("message", "활성 회원 목록 조회에 실패했습니다.");
+	    }
+	    
+	    return data;
+	}
+	
+	@ResponseBody
+	@RequestMapping(value="/user/list/deleted", method=RequestMethod.GET)
+	public HashMap<String, Object> getDeletedUsers(HttpSession session) {
+	    HashMap<String, Object> data = new HashMap<>();
+	    User currentUser = (User) session.getAttribute("user");
+	    
+	    if(currentUser == null || !"admin".equals(currentUser.getUserType())) {
+	        data.put("success", false);
+	        data.put("message", "권한이 없습니다.");
+	        return data;
+	    }
+	    
+	    try {
+	        DB db = new DB();
+	        ArrayList<User> userList = db.selectDeletedUsers();
+	        data.put("success", true);
+	        data.put("users", userList);
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	        data.put("success", false);
+	        data.put("message", "탈퇴 회원 목록 조회에 실패했습니다.");
+	    }
+	    
+	    return data;
 	}
 	
 	@ResponseBody

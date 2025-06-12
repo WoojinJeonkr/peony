@@ -140,6 +140,7 @@ public class DB {
 	    return user;
 	}
 	
+	// 전체 회원 조회
 	public ArrayList<User> selectAllUsers() {
 		this.open();
 		ArrayList<User> data = new ArrayList<>();
@@ -167,6 +168,66 @@ public class DB {
 		}
 		this.close();
 		return data;
+	}
+	
+	// 활성 회원 조회
+	public ArrayList<User> selectActiveUsers() {
+	    this.open();
+	    ArrayList<User> data = new ArrayList<>();
+	    try {
+	        String query = "SELECT * FROM user WHERE status = 'ACTIVE'";
+	        PreparedStatement statement = this.connection.prepareStatement(query);
+	        ResultSet result = statement.executeQuery();
+	        while (result.next()) {
+	            int idx = result.getInt("idx");
+	            String userType = result.getString("userType");
+	            String id = result.getString("id");
+	            String pwd = result.getString("pwd");
+	            String name = result.getString("name");
+	            String phone = result.getString("phone");
+	            String address = result.getString("address");
+	            String status = result.getString("status");
+	            String created = result.getString("created");
+	            String lastUpdated = result.getString("lastUpdated");
+	            String deletedAt = result.getString("deletedAt");
+	            data.add(new User(idx, id, pwd, userType, name, phone, address, status, created, lastUpdated, deletedAt));
+	        }
+	        statement.close();
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	    }
+	    this.close();
+	    return data;
+	}
+	
+	// 탈퇴 회원 조회
+	public ArrayList<User> selectDeletedUsers() {
+	    this.open();
+	    ArrayList<User> data = new ArrayList<>();
+	    try {
+	        String query = "SELECT * FROM user WHERE status = 'DELETED'";
+	        PreparedStatement statement = this.connection.prepareStatement(query);
+	        ResultSet result = statement.executeQuery();
+	        while (result.next()) {
+	            int idx = result.getInt("idx");
+	            String userType = result.getString("userType");
+	            String id = result.getString("id");
+	            String pwd = result.getString("pwd");
+	            String name = result.getString("name");
+	            String phone = result.getString("phone");
+	            String address = result.getString("address");
+	            String status = result.getString("status");
+	            String created = result.getString("created");
+	            String lastUpdated = result.getString("lastUpdated");
+	            String deletedAt = result.getString("deletedAt");
+	            data.add(new User(idx, id, pwd, userType, name, phone, address, status, created, lastUpdated, deletedAt));
+	        }
+	        statement.close();
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	    }
+	    this.close();
+	    return data;
 	}
 	
 	public void deactivateUsers(ArrayList<String> userIds) {

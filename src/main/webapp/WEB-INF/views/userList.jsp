@@ -20,52 +20,54 @@
             </div>
         </div>
         <div class="card-body">
-	        <div style="overflow-x: auto; max-width: 100%;">
-	            <form id="userForm">
-	                <table class="table table-hover">
-	                    <thead class="thead-light">
-	                        <tr>
-	                            <th><input type="checkbox" id="checkAll"></th>
-	                            <th>아이디</th>
-	                            <th>이름</th>
-	                            <th>전화번호</th>
-	                            <th>주소</th>
-	                            <th>권한</th>
-	                            <th>상태</th>
-	                            <th>가입일</th>
-	                            <th>수정일</th>
-	                            <th>삭제일</th>
-	                        </tr>
-	                    </thead>
-	                    <tbody>
-	                        <c:forEach var="user" items="${users}">
-	                            <tr data-user-id="${user.id}" ${user.status eq 'DELETED' ? 'class="deleted-user"' : ''}>
-	                                <td>
-							            <input type="checkbox" 
-							                   name="userIds" 
-							                   value="${user.id}" 
-							                   class="userCheckbox"
-							                   ${user.status eq 'DELETED' ? 'disabled' : ''}>
-							        </td>
-	                                <td>${user.id}</td>
-	                                <td>${user.name}</td>
-	                                <td><input type="text" class="form-control phone" value="${user.phone}" disabled></td>
-	                                <td><input type="text" class="form-control address" value="${user.address}" disabled></td>
-	                                <td>
-	                                    <select class="form-control userType" disabled>
-	                                        <option value="user" ${user.userType eq 'user' ? 'selected' : ''}>일반</option>
-	                                        <option value="admin" ${user.userType eq 'admin' ? 'selected' : ''}>관리자</option>
-	                                    </select>
-	                                </td>
-	                                <td>${user.status}</td>
-	                                <td>${user.created}</td>
-	                                <td>${user.lastUpdated}</td>
-	                                <td>${user.deletedAt}</td>
-	                            </tr>
-	                        </c:forEach>
-	                    </tbody>
-	                </table>
-	            </form>
+            <ul class="nav nav-tabs mb-3" id="userTabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="all-tab" data-tab="all" type="button" role="tab">
+                        전체 <span id="all-count" class="badge bg-secondary ms-1">0</span>
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="active-tab" data-tab="active" type="button" role="tab">
+                        활성 <span id="active-count" class="badge bg-success ms-1">0</span>
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="deleted-tab" data-tab="deleted" type="button" role="tab">
+                        탈퇴 <span id="deleted-count" class="badge bg-danger ms-1">0</span>
+                    </button>
+                </li>
+            </ul>
+
+            <div id="loadingSpinner" class="text-center d-none">
+                <div class="spinner-border" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+            </div>
+
+            <div style="overflow-x: auto; max-width: 100%;">
+                <form id="userForm">
+                    <table class="table table-hover">
+                        <thead class="thead-light">
+                            <tr>
+                                <th><input type="checkbox" id="checkAll"></th>
+                                <th>아이디</th>
+                                <th>이름</th>
+                                <th>전화번호</th>
+                                <th>주소</th>
+                                <th>권한</th>
+                                <th>상태</th>
+                                <th>가입일</th>
+                                <th>수정일</th>
+                                <th>삭제일</th>
+                            </tr>
+                        </thead>
+                        <tbody id="userTableBody">
+                            <tr>
+                                <td colspan="10" class="text-center text-muted">데이터를 불러오는 중...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </form>
             </div>
             <div class="text-center mt-3">
                 <a href="/" class="btn btn-outline-primary">홈으로</a>
