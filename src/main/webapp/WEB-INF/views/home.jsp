@@ -7,88 +7,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Peony</title>
     <link rel="stylesheet" href="/bootstrap/bootstrap.min.css">
-    <link rel="stylesheet" href="/css/common.css">
+    <link rel="stylesheet" href="/css/home.css">
     <script src="/js/jquery.min.js"></script>
     <script src="/bootstrap/bootstrap.min.js"></script>
 </head>
-<style>
-    .service-card {
-        background: var(--white);
-        border: 2px solid var(--gray-200);
-        border-radius: var(--border-radius-lg);
-        padding: 2rem 1.5rem;
-        text-align: center;
-        transition: var(--transition);
-        height: 100%;
-        box-shadow: var(--shadow-sm);
-    }
-    
-    .service-card:hover {
-        border-color: var(--primary-color);
-        transform: translateY(-4px);
-        box-shadow: var(--shadow-lg);
-    }
-    
-    .service-icon {
-        font-size: 3rem;
-        margin-bottom: 1rem;
-        opacity: 0.8;
-    }
-    
-    .service-card h4 {
-        margin-bottom: 1rem;
-        color: var(--gray-800);
-        font-weight: 600;
-    }
-    
-    .service-card p {
-        color: var(--gray-600);
-        margin-bottom: 1.5rem;
-        line-height: 1.6;
-    }
-    
-    .stats-widget {
-	    background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
-	    border-radius: var(--border-radius-lg);
-	    padding: 1rem 1.5rem;
-	    box-shadow: var(--shadow);
-	    transition: var(--transition);
-	    color: var(--white);
-	    text-align: center;
-	}
-	
-	.stats-widget:hover {
-	    transform: translateY(-2px);
-	    box-shadow: var(--shadow-lg);
-	}
-	
-	.stats-container {
-	    display: flex;
-	    justify-content: center;
-	    align-items: center;
-	    gap: 2rem;
-	    flex-wrap: wrap;
-	}
-	
-	.stats-text {
-	    font-size: 1.1rem;
-	    font-weight: 600;
-	    margin: 0;
-	    white-space: nowrap;
-	}
-	
-	@media (max-width: 576px) {
-	    .stats-container {
-	        gap: 1rem;
-	        flex-direction: column;
-	    }
-	    
-	    .stats-text {
-	        font-size: 1rem;
-	    }
-	}
-	    
-</style>
 <body>
     <%
         User currentUser = (User) session.getAttribute("user");
@@ -200,26 +122,5 @@
         </div>
     </div>
 </body>
-<script>
-	$(document).ready(function() {
-	    setInterval(function() {
-	        updateStats();
-	    }, 300000);
-	});
-	
-	function updateStats() {
-	    $.ajax({
-	        url: '/api/stats',
-	        type: 'GET',
-	        dataType: 'json',
-	        success: function(data) {
-	            $('.stats-number').eq(0).text(data.totalUsers);
-	            $('.stats-number').eq(1).text(data.todayUsers);
-	        },
-	        error: function() {
-	            console.log('통계 데이터 업데이트 실패');
-	        }
-	    });
-	}
-</script>
+<script src="/js/home.js"></script>
 </html>

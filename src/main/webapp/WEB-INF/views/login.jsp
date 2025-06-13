@@ -60,53 +60,5 @@
         </div>
     </div>
 </body>
-<script>
-    $('#loginForm').submit(function(e) {
-        e.preventDefault();
-        
-        const formData = {
-            id: $('#id').val(),
-            pwd: $('#pwd').val()
-        };
-        
-        if (!formData.id.trim()) {
-            showAlert('warning', '아이디를 입력해주세요.');
-            return;
-        }
-        if (!formData.pwd.trim()) {
-            showAlert('warning', '비밀번호를 입력해주세요.');
-            return;
-        }
-        
-        $.ajax({
-            url: '/login',
-            type: 'POST',
-            data: formData,
-            success: function(response) {
-                if (response.message === '로그인 성공') {
-                    showAlert('success', '로그인되었습니다.');
-                    setTimeout(function() {
-                        window.location.href = '/';
-                    }, 1500);
-                } else {
-                    showAlert('danger', response.message);
-                }
-            },
-            error: function() {
-                showAlert('danger', '로그인에 실패했습니다.');
-            }
-        });
-    });
-
-    function showAlert(type, message) {
-        const alertHtml = `
-            <div class="alert alert-${type} alert-dismissible fade show" role="alert">
-                ${message}
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-            </div>
-        `;
-        $('#alertContainer').html(alertHtml);
-        setTimeout(() => $('.alert').fadeOut(), 3000);
-    }
-</script>
+<script src="/js/login.js"></script>
 </html>
