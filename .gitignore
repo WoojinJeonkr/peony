@@ -95,6 +95,7 @@ $RECYCLE.BIN/
 
 # Local configuration files (if they contain sensitive data and are not meant for git)
 local.properties
+kakao.properties
 application-dev.properties
 application-local.yml
 
