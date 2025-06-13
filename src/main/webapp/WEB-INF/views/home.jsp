@@ -4,6 +4,7 @@
 <html>
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Peony</title>
     <link rel="stylesheet" href="/bootstrap/bootstrap.min.css">
     <link rel="stylesheet" href="/css/common.css">
@@ -45,6 +46,48 @@
         margin-bottom: 1.5rem;
         line-height: 1.6;
     }
+    
+    .stats-widget {
+	    background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+	    border-radius: var(--border-radius-lg);
+	    padding: 1rem 1.5rem;
+	    box-shadow: var(--shadow);
+	    transition: var(--transition);
+	    color: var(--white);
+	    text-align: center;
+	}
+	
+	.stats-widget:hover {
+	    transform: translateY(-2px);
+	    box-shadow: var(--shadow-lg);
+	}
+	
+	.stats-container {
+	    display: flex;
+	    justify-content: center;
+	    align-items: center;
+	    gap: 2rem;
+	    flex-wrap: wrap;
+	}
+	
+	.stats-text {
+	    font-size: 1.1rem;
+	    font-weight: 600;
+	    margin: 0;
+	    white-space: nowrap;
+	}
+	
+	@media (max-width: 576px) {
+	    .stats-container {
+	        gap: 1rem;
+	        flex-direction: column;
+	    }
+	    
+	    .stats-text {
+	        font-size: 1rem;
+	    }
+	}
+	    
 </style>
 <body>
     <%
@@ -52,7 +95,7 @@
     %>
     
     <nav class="navbar">
-        <div class="container">
+        <div class="container-fluid main-container">
             <a class="navbar-brand" href="/">Peony</a>
             <div class="d-flex align-items-center gap-3">
                 <% if (currentUser != null) { %>
@@ -87,7 +130,7 @@
             <div class="col-lg-10">
                 <div class="card">
                     <div class="card-header text-center">
-                        <h1 style="font-size: 2.5rem; font-weight: 300;">
+                        <h1 style="font-size: 2.5rem; font-weight: bold;">
                             멀티서비스 포털
                         </h1>
                         <p style="margin: 1rem 0 0 0; opacity: 0.9; font-size: 1.1rem;">
@@ -96,6 +139,16 @@
                     </div>
                     
                     <div class="card-body">
+                    	<div class="row g-4 mb-4">
+				            <div class="col-12">
+				                <div class="stats-widget">
+				                    <div class="stats-container">
+				                        <div class="stats-text">👥 총 가입자 ${totalUsers}명</div>
+				                        <div class="stats-text">📈 금일 가입자 ${todayUsers}명</div>
+				                    </div>
+				                </div>
+				            </div>
+				        </div>
                         <% if (currentUser != null) { %>
                             <div class="row g-4 mb-5">
                                 <div class="col-md-4">
@@ -147,4 +200,26 @@
         </div>
     </div>
 </body>
+<script>
+	$(document).ready(function() {
+	    setInterval(function() {
+	        updateStats();
+	    }, 300000);
+	});
+	
+	function updateStats() {
+	    $.ajax({
+	        url: '/api/stats',
+	        type: 'GET',
+	        dataType: 'json',
+	        success: function(data) {
+	            $('.stats-number').eq(0).text(data.totalUsers);
+	            $('.stats-number').eq(1).text(data.todayUsers);
+	        },
+	        error: function() {
+	            console.log('통계 데이터 업데이트 실패');
+	        }
+	    });
+	}
+</script>
 </html>

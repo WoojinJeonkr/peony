@@ -273,4 +273,39 @@ public class DB {
 			e.printStackTrace();
 		}
 	}
+	
+	// 전체 가입자 수 조회
+	public int getTotalUserCount() {
+	    int count = 0;
+	    String query = "SELECT COUNT(*) as total FROM user WHERE status = 'ACTIVE'";
+	    try (Connection connection = getConnection();
+	         PreparedStatement statement = connection.prepareStatement(query);
+	         ResultSet rs = statement.executeQuery()) {
+	        if (rs.next()) {
+	            count = rs.getInt("total");
+	        }
+	    } catch (SQLException e) {
+	        e.printStackTrace();
+	    }
+	    return count;
+	}
+
+	// 금일 가입자 수 조회
+	public int getTodayUserCount() {
+	    int count = 0;
+	    String today = new java.text.SimpleDateFormat("yyyy-MM-dd").format(new java.util.Date());
+	    String query = "SELECT COUNT(*) as today_count FROM user WHERE status = 'ACTIVE' AND DATE(created) = ?";
+	    try (Connection connection = getConnection();
+	         PreparedStatement statement = connection.prepareStatement(query)) {
+	        statement.setString(1, today);
+	        try (ResultSet rs = statement.executeQuery()) {
+	            if (rs.next()) {
+	                count = rs.getInt("today_count");
+	            }
+	        }
+	    } catch (SQLException e) {
+	        e.printStackTrace();
+	    }
+	    return count;
+	}
 }

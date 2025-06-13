@@ -9,6 +9,7 @@
 <html>
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>회원 관리 - Peony</title>
     <link rel="stylesheet" href="/bootstrap/bootstrap.min.css">
     <link rel="stylesheet" href="/css/common.css">
@@ -220,7 +221,7 @@
     %>
     
     <nav class="navbar">
-        <div class="container">
+        <div class="container-fluid main-container">
             <a class="navbar-brand" href="/">Peony</a>
             <div class="d-flex align-items-center gap-3">
                 <span class="text-muted me-3">

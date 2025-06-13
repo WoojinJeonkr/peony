@@ -26,6 +26,12 @@ public class HomeController {
 	        db.createTable();
 	    }
 		
+		int totalUsers = db.getTotalUserCount();
+        int todayUsers = db.getTodayUserCount();
+        
+        model.addAttribute("totalUsers", totalUsers);
+        model.addAttribute("todayUsers", todayUsers);
+		
 		return "home";
 	}
 	
