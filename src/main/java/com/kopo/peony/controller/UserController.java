@@ -7,7 +7,9 @@ import javax.servlet.http.HttpSession;
 
 import org.mindrot.jbcrypt.BCrypt;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -23,6 +25,9 @@ public class UserController {
 	
 	@Autowired
 	private DB db;
+	
+	@Value("${kakao.api.key}")
+    private String kakaoApiKey;
 	
 	@RequestMapping(value="/user/register", method = RequestMethod.GET)
 	public String register() {
@@ -207,11 +212,15 @@ public class UserController {
 	}
 	
 	@RequestMapping(value="/user/mypage", method = RequestMethod.GET)
-	public String moveMyPage(HttpSession session) {
+	public String moveMyPage(Model model, HttpSession session) {
 	    User currentUser = (User) session.getAttribute("user");
 	    if(currentUser == null) {
 	        return "redirect:/login";
 	    }
+	    
+	    System.out.println(kakaoApiKey);
+	    model.addAttribute("kakaoApiKey", kakaoApiKey);
+	    
 	    return "mypage";
 	}
 	

@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="/css/common.css">
     <script src="/js/jquery.min.js"></script>
     <script src="/bootstrap/bootstrap.min.js"></script>
+    <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
 </head>
 <body>
     <nav class="navbar">
@@ -56,7 +57,10 @@
                             
                             <div class="form-group">
                                 <label class="form-label">주소</label>
-                                <textarea class="form-control" id="address" name="address" rows="3" placeholder="주소를 입력하세요" required></textarea>
+                                <div class="d-flex mb-2">
+							        <input type="text" class="form-control flex-grow-1" id="address" name="address" placeholder="주소" readonly required >
+							        <button type="button" class="btn btn-outline-secondary ms-2" onclick="getAddressByDaumPostcode()">주소 찾기</button>
+							    </div>
                             </div>
                             
                             <div class="text-center">
@@ -76,6 +80,20 @@
     </div>
 </body>
 <script>
+	function getAddressByDaumPostcode() {
+	    new daum.Postcode({
+	        oncomplete: function(data) {
+	            var addr = '';
+	            if (data.userSelectedType === 'R') {
+	                addr = data.roadAddress;
+	            } else {
+	                addr = data.jibunAddress;
+	            }
+	            document.getElementById("address").value = addr;
+	        }
+	    }).open();
+	}
+
     $('#registerForm').submit(function(e) {
         e.preventDefault();
         

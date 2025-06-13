@@ -10,6 +10,7 @@
     <link rel="stylesheet" href="/css/common.css">
     <script src="/js/jquery.min.js"></script>
     <script src="/bootstrap/bootstrap.min.js"></script>
+    <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
 </head>
 <body>
     <%
@@ -79,9 +80,13 @@
                             </div>
                             
                             <div class="form-group">
-                                <label class="form-label">주소</label>
-                                <textarea class="form-control" id="userAddress" name="address" rows="3" disabled></textarea>
-                            </div>
+							    <label class="form-label">주소</label>
+							    <div class="d-flex mb-2">
+							        <input type="text" class="form-control" id="userAddress" name="address" readonly>
+							        <button type="button" class="btn btn-outline-secondary ms-2" id="addressSearchBtn" style="display: none;">주소 검색</button>
+							    </div>
+							    <div id="map" style="width:100%; height:300px; margin-top:10px;"></div>
+							</div>
                             
                             <div class="row">
                                 <div class="col-md-6">
@@ -110,7 +115,10 @@
         </div>
     </div>
 </body>
+<script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=${kakaoApiKey}&libraries=services"></script>
 <script>
+	let map = null;
+	let marker = null;
     let originalData = {};
     let isEditing = false;
 
@@ -130,6 +138,15 @@
             loadUserInfo();
         });
     });
+    
+    function getAddressByDaumPostcode() {
+        new daum.Postcode({
+            oncomplete: function(data) {
+                var addr = data.userSelectedType === 'R' ? data.roadAddress : data.jibunAddress;
+                document.getElementById("userAddress").value = addr;
+            }
+        }).open();
+    }
 
     function loadUserInfo() {
         $.ajax({
@@ -147,6 +164,11 @@
                     $('#userAddress').val(user.address);
                     $('#created').val(formatDate(user.created));
                     $('#lastUpdated').val(formatDate(user.lastUpdated));
+                    
+                 	// 주소가 있으면 지도 표시
+                    if (user.address) {
+                        showMap(user.address);
+                    }
                 } else {
                     showAlert('danger', response.message);
                 }
@@ -156,24 +178,59 @@
             }
         });
     }
+    
+    var mapContainer = document.getElementById('map'),
+	    mapOption = {
+	        center: new daum.maps.LatLng(37.537187, 127.005476),
+	        level: 5
+	    };
+	
+    function showMap(address) {
+        if (!map) {
+            map = new daum.maps.Map(document.getElementById('map'), {
+                center: new daum.maps.LatLng(37.537187, 127.005476),
+                level: 5
+            });
+            marker = new daum.maps.Marker({
+                position: new daum.maps.LatLng(37.537187, 127.005476),
+                map: map
+            });
+            
+            map.setDraggable(false);
+            map.setZoomable(false);
+        }
+        var geocoder = new daum.maps.services.Geocoder();
+        geocoder.addressSearch(address, function(results, status) {
+            if (status === daum.maps.services.Status.OK) {
+                var coords = new daum.maps.LatLng(results[0].y, results[0].x);
+                map.setCenter(coords);
+                marker.setPosition(coords);
+            }
+        });
+    }
+
 
     function enableEditing() {
         isEditing = true;
-        $('#userName, #userPhone, #userAddress').prop('disabled', false);
+        $('#userName, #userPhone').prop('disabled', false);
+        $('#userAddress').prop('readonly', false);
+        $('#userAddress').css('background-color', 'white');
         $('#editBtn').hide();
-        $('#saveBtn, #cancelBtn').show();
-        
+        $('#saveBtn, #cancelBtn, #addressSearchBtn').show();
         $('#userName, #userPhone, #userAddress').removeClass('readonly-field');
     }
 
     function disableEditing() {
         isEditing = false;
-        $('#userName, #userPhone, #userAddress').prop('disabled', true);
-        $('#saveBtn, #cancelBtn').hide();
+        $('#userName, #userPhone').prop('disabled', true);
+        $('#userAddress').prop('readonly', true);
+        $('#userAddress').css('background-color', '#e9ecef');
+        $('#saveBtn, #cancelBtn, #addressSearchBtn').hide();
         $('#editBtn').show();
-        
         $('#userName, #userPhone, #userAddress').addClass('readonly-field');
     }
+    
+    $('#addressSearchBtn').click(getAddressByDaumPostcode);
 
     function saveUserInfo() {
         const userData = {
