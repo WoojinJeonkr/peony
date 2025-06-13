@@ -218,7 +218,6 @@ public class UserController {
 	        return "redirect:/login";
 	    }
 	    
-	    System.out.println(kakaoApiKey);
 	    model.addAttribute("kakaoApiKey", kakaoApiKey);
 	    
 	    return "mypage";
