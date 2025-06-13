@@ -1,10 +1,13 @@
-package com.kopo.peony;
+package com.kopo.peony.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+
+import com.kopo.peony.DB;
+import com.kopo.peony.DatabaseInitializer;
 
 @Controller
 public class HomeController {

@@ -1,4 +1,4 @@
-package com.kopo.peony;
+package com.kopo.peony.util;
 
 import org.mindrot.jbcrypt.BCrypt;
 

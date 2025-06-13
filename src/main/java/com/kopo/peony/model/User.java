@@ -1,4 +1,4 @@
-package com.kopo.peony;
+package com.kopo.peony.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -21,18 +21,18 @@ public class User {
 	String lastUpdated;
 	String deletedAt;
 	
-	User(String id, String pwd) {
+	public User(String id, String pwd) {
 		this.id = id;
 		this.pwd = pwd;
 	}
 	
-	User(String idx, String userType, String name) {
+	public User(String idx, String userType, String name) {
 		this.idx = Integer.parseInt(idx);
 		this.userType = userType;
 		this.name = name;
 	}
 
-	User(String id, String pwd, String userType, String name, String phone, String address) {
+	public User(String id, String pwd, String userType, String name, String phone, String address) {
 		this.id = id;
 		this.pwd = pwd;
 		this.userType = userType;

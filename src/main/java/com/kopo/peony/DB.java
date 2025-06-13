@@ -14,6 +14,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.sqlite.SQLiteConfig;
 
+import com.kopo.peony.model.User;
+
 @Component
 public class DB {
 	
@@ -97,12 +99,12 @@ public class DB {
 		String query = "INSERT INTO user (id, pwd, userType, name, phone, address, status, created, lastUpdated, deletedAt) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 		try (Connection connection = getConnection();
              PreparedStatement statement = connection.prepareStatement(query)) {
-			statement.setString(1, user.id);
-			statement.setString(2, user.pwd);
-			statement.setString(3, user.userType);
-			statement.setString(4, user.name);
-			statement.setString(5, user.phone);
-			statement.setString(6, user.address);
+			statement.setString(1, user.getId());
+			statement.setString(2, user.getPwd());
+			statement.setString(3, user.getUserType());
+			statement.setString(4, user.getName());
+			statement.setString(5, user.getPhone());
+			statement.setString(6, user.getAddress());
 			statement.setString(7, "ACTIVE");
 			String now = (new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss")).format(new java.util.Date());
 			statement.setString(8, now);

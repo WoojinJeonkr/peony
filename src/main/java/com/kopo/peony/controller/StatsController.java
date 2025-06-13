@@ -1,4 +1,4 @@
-package com.kopo.peony;
+package com.kopo.peony.controller;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -8,6 +8,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
+
+import com.kopo.peony.DB;
 
 @Controller
 @RequestMapping("/api")
