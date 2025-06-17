@@ -1,48 +1,42 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
-<%@ page import="com.kopo.peony.model.User" %>
 <!DOCTYPE html>
-<html>
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Peony</title>
-    <link rel="stylesheet" href="/bootstrap/bootstrap.min.css">
-    <link rel="stylesheet" href="/css/home.css">
-    <script src="/js/jquery.min.js"></script>
-    <script src="/bootstrap/bootstrap.min.js"></script>
+    <link rel="stylesheet" th:href="@{/bootstrap/bootstrap.min.css}">
+    <link rel="stylesheet" th:href="@{/css/home.css}">
+    <script th:src="@{/js/jquery.min.js}"></script>
+    <script th:src="@{/bootstrap/bootstrap.min.js}"></script>
 </head>
 <body>
-    <%
-        User currentUser = (User) session.getAttribute("user");
-    %>
-    
     <nav class="navbar">
         <div class="container-fluid main-container">
             <a class="navbar-brand" href="/">Peony</a>
             <div class="d-flex align-items-center gap-3">
-                <% if (currentUser != null) { %>
-                    <span class="text-muted me-3">
-                        <%= currentUser.getName() %>님, 환영합니다!
+                <div th:if="${session.user != null}" class="d-flex align-items-center gap-3">
+                    <span class="text-muted me-3" th:text="|${session.user.name}님, 환영합니다!|">
                     </span>
-                    <a class="nav-link" href="/user/mypage">
+                    <a class="nav-link" th:href="@{/user/mypage}">
                         마이페이지
                     </a>
-                    <% if ("admin".equals(currentUser.getUserType())) { %>
-                        <a class="nav-link" href="/user/list">
+                    <div th:if="${session.user.userType == 'admin'}">
+                        <a class="nav-link" th:href="@{/user/list}">
                             회원 목록
                         </a>
-                    <% } %>
-                    <a class="nav-link" href="/logout">
+                    </div>
+                    <a class="nav-link" th:href="@{/logout}">
                         로그아웃
                     </a>
-                <% } else { %>
-                    <a class="nav-link" href="/login">
+                </div>
+                <div th:if="${session.user == null}">
+                    <a class="nav-link" th:href="@{/login}">
                         로그인
                     </a>
-                    <a class="nav-link" href="/user/register">
+                    <a class="nav-link" th:href="@{/user/register}">
                         회원가입
                     </a>
-                <% } %>
+                </div>
             </div>
         </div>
     </nav>
@@ -59,19 +53,19 @@
                             게시판, 쇼핑몰, 게임을 한 번에 경험하세요
                         </p>
                     </div>
-                    
+
                     <div class="card-body">
                     	<div class="row g-4 mb-4">
 				            <div class="col-12">
 				                <div class="stats-widget">
 				                    <div class="stats-container">
-				                        <div class="stats-text">👥 총 가입자 ${totalUsers}명</div>
-				                        <div class="stats-text">📈 금일 가입자 ${todayUsers}명</div>
+				                        <div class="stats-text">👥 총 가입자 <span th:text="${totalUsers}">0</span>명</div>
+				                        <div class="stats-text">📈 금일 가입자 <span th:text="${todayUsers}">0</span>명</div>
 				                    </div>
 				                </div>
 				            </div>
 				        </div>
-                        <% if (currentUser != null) { %>
+                        <div th:if="${session.user != null}">
                             <div class="row g-4 mb-5">
                                 <div class="col-md-4">
                                     <div class="service-card">
@@ -104,7 +98,8 @@
                                     </div>
                                 </div>
                             </div>
-                        <% } else { %>
+                        </div>
+                        <div th:if="${session.user == null}">
                             <div class="text-center">
                                 <div class="welcome-section mb-5">
                                     <h2 style="color: var(--gray-800); margin-bottom: 1rem;">
@@ -115,12 +110,12 @@
                                     </p>
                                 </div>
                             </div>
-                        <% } %>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 </body>
-<script src="/js/home.js"></script>
+<script th:src="@{/js/home.js}"></script>
 </html>

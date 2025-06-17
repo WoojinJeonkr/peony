@@ -3,9 +3,11 @@ package com.kopo.peony;
 import java.io.File;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Component;
 
 @Component
+@PropertySource("classpath:database.properties")
 public class DatabaseInitializer {
 	
 	@Value("${sqlite.db.path}")

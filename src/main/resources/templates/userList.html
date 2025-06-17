@@ -1,36 +1,20 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
-<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
-<%@ page import="com.kopo.peony.model.User" %>
-<%
-	request.setCharacterEncoding("UTF-8");
-	response.setContentType("text/html; charset=UTF-8");
-%>
 <!DOCTYPE html>
-<html>
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>회원 관리 - Peony</title>
-    <link rel="stylesheet" href="/bootstrap/bootstrap.min.css">
-    <link rel="stylesheet" href="/css/userList.css">
-    <script src="/js/jquery.min.js"></script>
-    <script src="/bootstrap/bootstrap.min.js"></script>
+    <link rel="stylesheet" th:href="@{/bootstrap/bootstrap.min.css}">
+    <link rel="stylesheet" th:href="@{/css/userList.css}">
+    <script th:src="@{/js/jquery.min.js}"></script>
+    <script th:src="@{/bootstrap/bootstrap.min.js}"></script>
 </head>
 <body>
-    <%
-        User currentUser = (User) session.getAttribute("user");
-        if (currentUser == null || !"admin".equals(currentUser.getUserType())) {
-            response.sendRedirect("/");
-            return;
-        }
-    %>
-    
     <nav class="navbar">
         <div class="container-fluid main-container">
             <a class="navbar-brand" href="/">Peony</a>
             <div class="d-flex align-items-center gap-3">
-                <span class="text-muted me-3">
-                    <%= currentUser.getName() %>님, 환영합니다!
+                <span class="text-muted me-3" th:if="${session.user != null}" th:text="|${session.user.name}님, 환영합니다!|">
                 </span>
                 <a class="nav-link" href="/user/mypage">마이페이지</a>
                 <a class="nav-link" href="/user/list">회원 목록</a>
@@ -129,5 +113,5 @@
         </div>
     </div>
 </body>
-<script src="/js/userList.js"></script>
+<script th:src="@{/js/userList.js}"></script>
 </html>

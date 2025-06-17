@@ -3,16 +3,16 @@ package com.kopo.peony.controller;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import javax.servlet.http.HttpSession;
-
 import org.mindrot.jbcrypt.BCrypt;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
@@ -20,7 +20,10 @@ import com.kopo.peony.DB;
 import com.kopo.peony.model.User;
 import com.kopo.peony.util.PasswordUtil;
 
+import jakarta.servlet.http.HttpSession;
+
 @Controller
+@PropertySource("classpath:kakao.properties")
 public class UserController {
 	
 	@Autowired
@@ -29,13 +32,13 @@ public class UserController {
 	@Value("${kakao.api.key}")
     private String kakaoApiKey;
 	
-	@RequestMapping(value="/user/register", method = RequestMethod.GET)
+	@GetMapping("/user/register")
 	public String register() {
 		return "register";
 	}
 	
 	@ResponseBody
-	@RequestMapping(value="/user/insert", method = RequestMethod.POST)
+	@PostMapping("/user/insert")
 	public HashMap<String, String> insert(@RequestParam("id") String id, @RequestParam("pwd") String pwd,
 	                                    @RequestParam("name") String name, @RequestParam("phone") String phone,
 	                                    @RequestParam("address") String address) {
@@ -61,13 +64,13 @@ public class UserController {
 	    
 	}
 	
-	@RequestMapping(value="/login")
+	@GetMapping(value="/login")
 	public String moveLoginPage() {
 		return "login";
 	}
 	
 	@ResponseBody
-	@RequestMapping(value="/login", method = RequestMethod.POST)
+	@PostMapping("/login")
 	public HashMap<String, String> login(@RequestParam("id") String id, @RequestParam("pwd") String pwd, HttpSession session) {
 		HashMap<String, String> data = new HashMap<>();
 	    User user = db.getUserInfo(id);
@@ -88,13 +91,13 @@ public class UserController {
 	    return data;
 	}
 	
-	@RequestMapping("/logout")
+	@GetMapping("/logout")
 	public String logout(HttpSession session) {
 	    session.invalidate();
 	    return "redirect:/";
 	}
 	
-	@RequestMapping("/user/list")
+	@GetMapping("/user/list")
 	public String moveUserListPage(HttpSession session) {
 	    User currentUser = (User) session.getAttribute("user");
 	    if(currentUser == null || !"admin".equals(currentUser.getUserType())) {
@@ -105,7 +108,7 @@ public class UserController {
 	}
 	
 	@ResponseBody
-	@RequestMapping(value="/user/list/all", method=RequestMethod.GET)
+	@GetMapping("/user/list/all")
 	public HashMap<String, Object> getAllUsers(HttpSession session) {
 		HashMap<String, Object> data = new HashMap<>();
 	    User currentUser = (User) session.getAttribute("user");
@@ -130,7 +133,7 @@ public class UserController {
 	}
 	
 	@ResponseBody
-	@RequestMapping(value="/user/list/active", method=RequestMethod.GET)
+	@GetMapping("/user/list/active")
 	public HashMap<String, Object> getActiveUsers(HttpSession session) {
 	    HashMap<String, Object> data = new HashMap<>();
 	    User currentUser = (User) session.getAttribute("user");
@@ -156,7 +159,7 @@ public class UserController {
 	}
 	
 	@ResponseBody
-	@RequestMapping(value="/user/list/deleted", method=RequestMethod.GET)
+	@GetMapping("/user/list/deleted")
 	public HashMap<String, Object> getDeletedUsers(HttpSession session) {
 	    HashMap<String, Object> data = new HashMap<>();
 	    User currentUser = (User) session.getAttribute("user");
@@ -182,7 +185,7 @@ public class UserController {
 	}
 	
 	@ResponseBody
-	@RequestMapping(value="/user/deactivate", method=RequestMethod.POST)
+	@PostMapping("/user/deactivate")
 	public HashMap<String, String> deactivateUsers(@RequestBody ArrayList<String> userIds) {
 	    HashMap<String, String> data = new HashMap<>();
 	    
@@ -197,7 +200,7 @@ public class UserController {
 	}
 
 	@ResponseBody
-	@RequestMapping(value="/user/update", method=RequestMethod.PUT)
+	@PutMapping("/user/update")
 	public HashMap<String, String> updateUser(@RequestBody User user) {
 	    HashMap<String, String> data = new HashMap<>();
 	    
@@ -211,7 +214,7 @@ public class UserController {
 	    return data;
 	}
 	
-	@RequestMapping(value="/user/mypage", method = RequestMethod.GET)
+	@GetMapping("/user/mypage")
 	public String moveMyPage(Model model, HttpSession session) {
 	    User currentUser = (User) session.getAttribute("user");
 	    if(currentUser == null) {
@@ -224,7 +227,7 @@ public class UserController {
 	}
 	
 	@ResponseBody
-	@RequestMapping(value="/user/myinfo", method=RequestMethod.GET)
+	@GetMapping("/user/myinfo")
 	public HashMap<String, Object> getMyInfo(HttpSession session) {
 	    HashMap<String, Object> data = new HashMap<>();
 	    User currentUser = (User) session.getAttribute("user");
@@ -254,7 +257,7 @@ public class UserController {
 	}
 	
 	@ResponseBody
-	@RequestMapping(value="/user/myinfo/update", method=RequestMethod.PUT)
+	@PutMapping("/user/myinfo/update")
 	public HashMap<String, String> updateMyInfo(@RequestBody User user, HttpSession session) {
 	    HashMap<String, String> data = new HashMap<>();
 	    User currentUser = (User) session.getAttribute("user");

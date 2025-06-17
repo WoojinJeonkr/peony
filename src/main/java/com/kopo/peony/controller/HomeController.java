@@ -3,8 +3,7 @@ package com.kopo.peony.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.GetMapping;
 
 import com.kopo.peony.DB;
 import com.kopo.peony.DatabaseInitializer;
@@ -18,7 +17,7 @@ public class HomeController {
 	@Autowired
 	private DB db;
 	
-	@RequestMapping(value = "/", method = RequestMethod.GET)
+	@GetMapping("/")
 	public String home(Model model) {
 		
 		if (!databaseInitializer.isDatabaseReady()) {
